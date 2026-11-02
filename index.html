@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="uz" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitobWeb - Onlayn Kitob Do'koni</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Ikonkalar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.4s ease-out forwards; }
+        .book-card:hover .book-img { transform: scale(1.07) rotate(1deg); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans min-h-screen flex flex-col">
+
+    <!-- Bildirishnoma (Toast) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i class="fas fa-check-circle text-xl"></i>
+        <span id="toast-msg">Muvaffaqiyatli!</span>
+    </div>
+
+    <!-- Navigatsiya (Navbar) -->
+    <nav class="sticky top-0 z-40 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" onclick="showPage('home')" class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                <i class="fas fa-book-open animate-bounce"></i> KitobWeb
+            </a>
+            
+            <!-- Menyu (5 ta sahifa) -->
+            <div class="hidden md:flex items-center space-x-6 font-medium">
+                <button onclick="showPage('home')" class="nav-btn text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition" data-target="home">1. Bosh sahifa</button>
+                <button onclick="showPage('catalog')" class="nav-btn hover:text-indigo-500 transition" data-target="catalog">2. Kitoblar</button>
+                <button onclick="showPage('about')" class="nav-btn hover:text-indigo-500 transition" data-target="about">3. Biz haqimizda</button>
+                <button onclick="showPage('contact')" class="nav-btn hover:text-indigo-500 transition" data-target="contact">4. Aloqa</button>
+            </div>
+
+            <!-- O'ng tugmalar -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <i id="theme-icon" class="fas fa-moon text-lg"></i>
+                </button>
+                <button onclick="showPage('cart')" class="relative p-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition flex items-center gap-2 px-4 shadow-md shadow-indigo-500/20">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="hidden sm:inline font-medium">5. Savatcha</span>
+                    <span id="cart-count" class="bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+        <!-- Mobil menyu -->
+        <div class="flex md:hidden justify-around border-t border-slate-200 dark:border-slate-700 py-2 text-xs font-medium bg-white dark:bg-slate-800">
+            <button onclick="showPage('home')" class="py-1 px-2 rounded hover:text-indigo-500">Bosh sahifa</button>
+            <button onclick="showPage('catalog')" class="py-1 px-2 rounded hover:text-indigo-500">Kitoblar</button>
+            <button onclick="showPage('about')" class="py-1 px-2 rounded hover:text-indigo-500">Biz haqimizda</button>
+            <button onclick="showPage('contact')" class="py-1 px-2 rounded hover:text-indigo-500">Aloqa</button>
+        </div>
+    </nav>
+
+    <!-- ================= 1-SAHIFA: BOSH SAHIFA ================= -->
+    <section id="home" class="page-section active flex-grow">
+        <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white py-20 px-4">
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+                <div class="space-y-6">
+                    <span class="inline-block bg-indigo-500/30 border border-indigo-400/30 px-4 py-1.5 rounded-full text-sm font-medium">
+                        ✨ Eng sara asarlar makoni
+                    </span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+                        Mutolaa bilan <span class="text-amber-400">dunyoqarashingizni</span> kengaytiring!
+                    </h1>
+                    <p class="text-indigo-200 text-lg">
+                        O'zbek va jahon adabiyotining eng mashhur durdonalari endi bir joyda. Tezkor yetkazib berish va hamyonbop narxlar.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="showPage('catalog')" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold px-8 py-3.5 rounded-xl transition transform hover:-translate-y-1 shadow-lg">
+                            Kitoblarni ko'rish <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button onclick="showPage('about')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3.5 rounded-xl backdrop-blur-sm transition">
+                            Batafsil ma'lumot
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80" alt="Books" class="rounded-2xl shadow-2xl animate-float max-h-96 object-cover border-4 border-white/10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Ommabop kitoblar (Tezkor ko'rinish) -->
+        <div class="max-w-7xl mx-auto px-4 py-16">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold">🔥 Hafta bestsellerlari</h2>
+                    <p class="text-slate-500 dark:text-slate-400">O'quvchilarimiz eng ko'p xarid qilayotgan kitoblar</p>
+                </div>
+                <button onclick="showPage('catalog')" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+                    Barchasi <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+            <div id="featured-books" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </div>
+    </section>
+
+    <!-- ================= 2-SAHIFA: KITOBLAR KATALOGI ================= -->
+    <section id="catalog" class="page-section flex-grow max-w-7xl mx-auto px-4 py-12 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h2 class="text-3xl font-bold">📚 Barcha kitoblar katalogi</h2>
+            
+            <!-- Qidiruv va Filter -->
+            <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                <input type="text" id="search-input" oninput="filterBooks()" placeholder="Kitob yoki muallif izlash..." class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-grow">
+                <select id="category-filter" onchange="filterBooks()" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="all">Barcha janrlar</option>
+                    <option value="badiiy">Badiiy adabiyot</option>
+                    <option value="biznes">Biznes va Shaxsiy rivojlanish</option>
+                    <option value="jahon">Jahon adabiyoti</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="catalog-books" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </section>
+
+    <!-- ================= 3-SAHIFA: BIZ HAQIMIZDA ================= -->
+    <section id="about" class="page-section flex-grow max-w-5xl mx-auto px-4 py-16 w-full">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-4xl font-extrabold mb-4">Biz haqimizda</h2>
+            <p class="text-lg text-slate-600 dark:text-slate-300">
+                <strong>KitobWeb</strong> — 2026-yilda tashkil etilgan zamonaviy onlayn kitob do'koni bo'lib, maqsadimiz har bir xonadonga ziyo va ma'rifat ulashishdir.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-truck-fast"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Tezkor yetkazish</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">O'zbekiston bo'ylab 24-48 soat ichida buyurtmangizni eshigingizgacha yetkazamiz.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">100% Original</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">Barcha kitoblarimiz rasmiy nashriyotlardan keltiriladi va yuqori sifatga ega.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">24/7 Qo'llab-quvvatlash</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">Telegram botimiz orqali istalgan vaqtda savollaringizga javob olishingiz mumkin.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= 4-SAHIFA: ALOQA ================= -->
+    <section id="contact" class="page-section flex-grow max-w-4xl mx-auto px-4 py-12 w-full">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-5 border border-slate-200 dark:border-slate-700">
+            <div class="md:col-span-2 bg-indigo-600 text-white p-8 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Bog'lanish</h3>
+                    <p class="text-indigo-200 text-sm mb-8">Savol, taklif yoki maxsus kitob buyurtmangiz bo'lsa, bizga yozing. Xabar to'g'ridan-to'g'ri Telegram botimizga boradi!</p>
+                    <div class="space-y-4 text-sm">
+                        <p class="flex items-center gap-3"><i class="fas fa-phone"></i> +998 (90) 123-45-67</p>
+                        <p class="flex items-center gap-3"><i class="fas fa-envelope"></i> info@kitobweb.uz</p>
+                        <p class="flex items-center gap-3"><i class="fas fa-location-dot"></i> Toshkent sh., Kalanov ko'chasi</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 text-xl pt-8">
+                    <a href="#" class="hover:text-amber-300"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="hover:text-amber-300"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-amber-300"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+            <form onsubmit="sendContactMessage(event)" class="md:col-span-3 p-8 space-y-5">
+                <h3 class="text-2xl font-bold">Xabar yuborish</h3>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Ismingiz</label>
+                    <input type="text" id="contact-name" required placeholder="Ismingizni kiriting" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Telefon raqamingiz</label>
+                    <input type="tel" id="contact-phone" required placeholder="+998 90 123 45 67" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Xabaringiz</label>
+                    <textarea id="contact-msg" rows="4" required placeholder="Xabar matni..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                </div>
+                <button type="submit" id="contact-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                    Telegram orqali yuborish <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================= 5-SAHIFA: SAVATCHA VA BUYURTMA ================= -->
+    <section id="cart" class="page-section flex-grow max-w-6xl mx-auto px-4 py-12 w-full">
+        <h2 class="text-3xl font-bold mb-8">🛒 Xarid savatchasi</h2>
+        
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Savatchadagi kitoblar -->
+            <div class="lg:col-span-2 space-y-4" id="cart-items"></div>
+
+            <!-- Rasmiylashtirish oynasi -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700 h-fit">
+                <h3 class="text-xl font-bold mb-4 border-b border-slate-200 dark:border-slate-700 pb-3">Buyurtmani rasmiylashtirish</h3>
+                <div class="flex justify-between text-lg font-bold mb-6">
+                    <span>Jami summa:</span>
+                    <span id="cart-total" class="text-indigo-600 dark:text-indigo-400">0 so'm</span>
+                </div>
+
+                <form onsubmit="submitOrder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">F.I.SH</label>
+                        <input type="text" id="order-name" required placeholder="To'liq ismingiz" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Telefon raqam</label>
+                        <input type="tel" id="order-phone" required placeholder="+998 __ ___ __ __" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Yetkazib berish manzili</label>
+                        <textarea id="order-address" rows="2" required placeholder="Shahar, tuman, ko'cha va uy raqami" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <button type="submit" id="order-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/20">
+                        Buyurtma berish <i class="fas fa-check ml-1"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center border-t border-slate-800 mt-auto">
+        <p>&copy; 2026 <strong>KitobWeb</strong>. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT QISMI ================= -->
+    <script>
+        // TELEGRAM BOT SOZLAMALARI
+        const BOT_TOKEN = "8746272362:AAGuDaAxP0xZXv53B3RzP1JXr3OcsJv0BJU";
+        const CHAT_ID = "7881483007";
+
+        // KITOBLAR BAZASI
+        const books = [
+            { id: 1, title: "O'tkan kunlar", author: "Abdulla Qodiriy", price: 45000, category: "badiiy", img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80" },
+            { id: 2, title: "Atom odatlar", author: "Jeyms Klir", price: 65000, category: "biznes", img: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80" },
+            { id: 3, title: "Shaytanat (1-kitob)", author: "Tohir Malik", price: 55000, category: "badiiy", img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80" },
+            { id: 4, title: "Boy ota, kambag'al ota", author: "Robert Kiyosaki", price: 50000, category: "biznes", img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=400&q=80" },
+            { id: 5, title: "Alkimyogar", author: "Paulo Koelo", price: 40000, category: "jahon", img: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=400&q=80" },
+            { id: 6, title: "Ufq romani", author: "Said Ahmad", price: 48000, category: "badiiy", img: "https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=400&q=80" },
+            { id: 7, title: "1984", author: "Jorj Oruell", price: 52000, category: "jahon", img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=400&q=80" },
+            { id: 8, title: "Diqqat (Deep Work)", author: "Kel Nyuport", price: 60000, category: "biznes", img: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('kitobweb_cart')) || [];
+
+        // SAHIFALARNI ALMASHTIRISH
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderCart();
+        }
+
+        // KITOB KARTASINI YASASH
+        function createBookCard(book) {
+            return `
+                <div class="book-card bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <div class="h-52 overflow-hidden rounded-xl mb-4 bg-slate-100 dark:bg-slate-700">
+                            <img src="${book.img}" alt="${book.title}" class="book-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">${book.category}</span>
+                        <h3 class="text-lg font-bold mt-1">${book.title}</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">${book.author}</p>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <span class="font-extrabold text-lg text-slate-900 dark:text-white">${book.price.toLocaleString()} so'm</span>
+                        <button onclick="addToCart(${book.id})" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white p-2.5 rounded-xl transition">
+                            <i class="fas fa-cart-plus"></i> Qo'shish
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // KITOBLARNI EKRANGA CHIQARISH
+        function renderBooks() {
+            document.getElementById('featured-books').innerHTML = books.slice(0, 4).map(createBookCard).join('');
+            filterBooks();
+        }
+
+        function filterBooks() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const cat = document.getElementById('category-filter').value;
+            const filtered = books.filter(b => {
+                const matchSearch = b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search);
+                const matchCat = cat === 'all' || b.category === cat;
+                return matchSearch && matchCat;
+            });
+            document.getElementById('catalog-books').innerHTML = filtered.length
+                ? filtered.map(createBookCard).join('')
+                : `<p class="col-span-4 text-center py-10 text-slate-500">Hech qanday kitob topilmadi...</p>`;
+        }
+
+        // SAVATCHA FUNKSIYALARI
+        function addToCart(id) {
+            const book = books.find(b => b.id === id);
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty++;
+            } else {
+                cart.push({ ...book, qty: 1 });
+            }
+            saveCart();
+            showToast(`"${book.title}" savatchaga qo'shildi!`);
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+            saveCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('kitobweb_cart', JSON.stringify(cart));
+            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-10 rounded-2xl text-center border border-slate-200 dark:border-slate-700"><i class="fas fa-shopping-basket text-5xl text-slate-300 mb-3"></i><p class="text-slate-500">Savatchangiz hozircha bo'sh</p></div>`;
+                totalEl.innerText = "0 so'm";
+                return;
+            }
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.qty;
+                return `
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-4">
+                            <img src="${item.img}" class="w-16 h-20 object-cover rounded-lg">
+                            <div>
+                                <h4 class="font-bold">${item.title}</h4>
+                                <p class="text-sm text-slate-500">${item.price.toLocaleString()} so'm</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 font-bold">-</button>
+                            <span class="font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            totalEl.innerText = total.toLocaleString() + " so'm";
+        }
+
+        // TELEGRAMGA BUYURTMA YUBORISH
+        async function submitOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) return showToast("Avval savatchaga kitob qo'shing!");
+
+            const btn = document.getElementById('order-btn');
+            btn.disabled = true;
+            btn.innerText = "Yuborilmoqda...";
+
+            const name = document.getElementById('order-name').value;
+            const phone = document.getElementById('order-phone').value;
+            const address = document.getElementById('order-address').value;
+            const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+            let bookList = cart.map((i, idx) => `${idx + 1}. ${i.title} (${i.qty} ta) - ${(i.price * i.qty).toLocaleString()} so'm`).join('\n');
+            const text = `📦 *YANGI BUYURTMA (KitobWeb)*\n\n👤 *Mijoz:* ${name}\n📞 *Tel:* ${phone}\n📍 *Manzil:* ${address}\n\n📚 *Kitoblar:*\n${bookList}\n\n💰 *Jami summa:* ${total.toLocaleString()} so'm`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+                });
+                cart = [];
+                saveCart();
+                e.target.reset();
+                showToast("Buyurtmangiz Telegram botga yuborildi!");
+            } catch (err) {
+                showToast("Xatolik yuz berdi!");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Buyurtma berish <i class="fas fa-check ml-1"></i>';
+            }
+        }
+
+        // TELEGRAMGA ALOQA XABARINI YUBORISH
+        async function sendContactMessage(e) {
+            e.preventDefault();
+            const btn = document.getElementById('contact-btn');
+            btn.disabled = true;
+
+            const name = document.getElementById('contact-name').value;
+            const phone = document.getElementById('contact-phone').value;
+            const msg = document.getElementById('contact-msg').value;
+
+            const text = `✉️ *YANGI XABAR (KitobWeb Aloqa)*\n\n👤 *Ism:* ${name}\n📞 *Tel:* ${phone}\n💬 *Xabar:* ${msg}`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+                });
+                e.target.reset();
+                showToast("Xabaringiz yuborildi!");
+            } catch (err) {
+                showToast("Xatolik yuz berdi!");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // DARK / LIGHT MODE
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun text-amber-400 text-lg' : 'fas fa-moon text-lg';
+        }
+
+        // TOAST XABARNOMA
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // BOSHLANG'ICH ISHGA TUSHIRISH
+        renderBooks();
+        saveCart();
+    </script>
+</body>
+</html>
